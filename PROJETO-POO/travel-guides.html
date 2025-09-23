@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guias de Viagem - Travel Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i data-feather="map" class="w-8 h-8 text-blue-600 mr-3"></i>
+                    <h1 class="text-2xl font-bold text-gray-800">Travel Planner</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i data-feather="home" class="w-5 h-5 mr-1"></i>
+                        Dashboard
+                    </a>
+                    <a href="#" id="logout-link" class="text-gray-600 hover:text-blue-600 transition-colors">
+                        <i data-feather="log-out" class="w-5 h-5 mr-1"></i>
+                        Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Guias de Viagem</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                Descubra informações úteis, dicas e recursos para suas viagens
+            </p>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Filtros</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Destino</label>
+                    <input type="text" id="destination-filter" placeholder="Ex: Madrid, Recife..." 
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Categoria</label>
+                    <select id="category-filter" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="">Todas as categorias</option>
+                        <option value="cultural">Cultural</option>
+                        <option value="gastronomia">Gastronomia</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="hospedagem">Hospedagem</option>
+                        <option value="dicas_gerais">Dicas Gerais</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="search-btn" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i data-feather="search" class="w-4 h-4 mr-2"></i>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Tabs -->
+        <div class="bg-white rounded-xl shadow-md mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6">
+                    <button id="guides-tab" class="py-4 px-1 border-b-2 border-blue-600 text-blue-600 font-medium">
+                        <i data-feather="book-open" class="w-5 h-5 mr-2"></i>
+                        Guias
+                    </button>
+                    <button id="resources-tab" class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                        <i data-feather="map-pin" class="w-5 h-5 mr-2"></i>
+                        Recursos
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Guides Content -->
+            <div id="guides-content" class="p-6">
+                <div id="guides-loading" class="text-center py-8">
+                    <i data-feather="loader" class="w-8 h-8 animate-spin mx-auto text-blue-600"></i>
+                    <p class="mt-2 text-gray-600">Carregando guias...</p>
+                </div>
+                <div id="guides-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+                    <!-- Guides will be loaded here -->
+                </div>
+                <div id="guides-empty" class="text-center py-12 hidden">
+                    <i data-feather="book-open" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">Nenhum guia encontrado</h3>
+                    <p class="text-gray-500">Tente ajustar os filtros de busca</p>
+                </div>
+            </div>
+
+            <!-- Resources Content -->
+            <div id="resources-content" class="p-6 hidden">
+                <div id="resources-loading" class="text-center py-8">
+                    <i data-feather="loader" class="w-8 h-8 animate-spin mx-auto text-blue-600"></i>
+                    <p class="mt-2 text-gray-600">Carregando recursos...</p>
+                </div>
+                <div id="resources-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+                    <!-- Resources will be loaded here -->
+                </div>
+                <div id="resources-empty" class="text-center py-12 hidden">
+                    <i data-feather="map-pin" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">Nenhum recurso encontrado</h3>
+                    <p class="text-gray-500">Tente ajustar os filtros de busca</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Guide Detail Modal -->
+    <div id="guide-modal" class="fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg p-8 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6">
+                <h2 id="guide-modal-title" class="text-2xl font-bold text-gray-800"></h2>
+                <button onclick="closeGuideModal()" class="text-gray-500 hover:text-gray-700">
+                    <i data-feather="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div id="guide-modal-content" class="prose max-w-none">
+                <!-- Guide content will be loaded here -->
+            </div>
+            <div class="mt-6 pt-6 border-t">
+                <button onclick="closeGuideModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Feather icons
+        feather.replace();
+
+        // Check authentication
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        if (!loggedInUser) {
+            window.location.href = 'login.html';
+        }
+
+        let currentTab = 'guides';
+        let currentGuides = [];
+        let currentResources = [];
+
+        // Tab switching
+        document.getElementById('guides-tab').addEventListener('click', () => switchTab('guides'));
+        document.getElementById('resources-tab').addEventListener('click', () => switchTab('resources'));
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab appearance
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            const activeTab = document.getElementById(`${tab}-tab`);
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+            activeTab.classList.add('border-blue-600', 'text-blue-600');
+            
+            // Show/hide content
+            document.getElementById('guides-content').classList.toggle('hidden', tab !== 'guides');
+            document.getElementById('resources-content').classList.toggle('hidden', tab !== 'resources');
+            
+            // Load data if not already loaded
+            if (tab === 'guides' && currentGuides.length === 0) {
+                loadGuides();
+            } else if (tab === 'resources' && currentResources.length === 0) {
+                loadResources();
+            }
+        }
+
+        // Load guides
+        async function loadGuides() {
+            const loading = document.getElementById('guides-loading');
+            const list = document.getElementById('guides-list');
+            const empty = document.getElementById('guides-empty');
+            
+            loading.classList.remove('hidden');
+            list.classList.add('hidden');
+            empty.classList.add('hidden');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/travel-guides');
+                const data = await response.json();
+                
+                currentGuides = data.guides;
+                displayGuides(currentGuides);
+                
+            } catch (error) {
+                console.error('Erro ao carregar guias:', error);
+                empty.classList.remove('hidden');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Load resources
+        async function loadResources() {
+            const loading = document.getElementById('resources-loading');
+            const list = document.getElementById('resources-list');
+            const empty = document.getElementById('resources-empty');
+            
+            loading.classList.remove('hidden');
+            list.classList.add('hidden');
+            empty.classList.add('hidden');
+            
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/travel-resources');
+                const data = await response.json();
+                
+                currentResources = data.resources;
+                displayResources(currentResources);
+                
+            } catch (error) {
+                console.error('Erro ao carregar recursos:', error);
+                empty.classList.remove('hidden');
+            } finally {
+                loading.classList.add('hidden');
+            }
+        }
+
+        // Display guides
+        function displayGuides(guides) {
+            const list = document.getElementById('guides-list');
+            const empty = document.getElementById('guides-empty');
+            
+            if (guides.length === 0) {
+                list.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            list.innerHTML = guides.map(guide => `
+                <div class="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="openGuideModal(${guide.id})">
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="text-lg font-semibold text-gray-800">${guide.title}</h3>
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">${guide.category}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2"><i data-feather="map-pin" class="w-4 h-4 mr-1"></i>${guide.destination}</p>
+                    <p class="text-gray-700 text-sm mb-4 line-clamp-3">${guide.content.substring(0, 150)}...</p>
+                    <div class="flex flex-wrap gap-1 mb-3">
+                        ${guide.tags.map(tag => `<span class="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded">${tag}</span>`).join('')}
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <span>Por ${guide.author}</span>
+                        <span>${guide.created_date}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            list.classList.remove('hidden');
+            empty.classList.add('hidden');
+            feather.replace();
+        }
+
+        // Display resources
+        function displayResources(resources) {
+            const list = document.getElementById('resources-list');
+            const empty = document.getElementById('resources-empty');
+            
+            if (resources.length === 0) {
+                list.classList.add('hidden');
+                empty.classList.remove('hidden');
+                return;
+            }
+            
+            list.innerHTML = resources.map(resource => `
+                <div class="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition-shadow">
+                    <div class="flex items-start justify-between mb-3">
+                        <h3 class="text-lg font-semibold text-gray-800">${resource.title}</h3>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">${resource.resource_type}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2"><i data-feather="map-pin" class="w-4 h-4 mr-1"></i>${resource.destination}</p>
+                    <p class="text-gray-700 text-sm mb-4">${resource.description}</p>
+                    ${resource.contact_info ? `
+                        <div class="space-y-1 text-xs text-gray-600">
+                            ${resource.contact_info.telefone ? `<p><i data-feather="phone" class="w-3 h-3 mr-1"></i>${resource.contact_info.telefone}</p>` : ''}
+                            ${resource.contact_info.email ? `<p><i data-feather="mail" class="w-3 h-3 mr-1"></i>${resource.contact_info.email}</p>` : ''}
+                            ${resource.contact_info.endereco ? `<p><i data-feather="map-pin" class="w-3 h-3 mr-1"></i>${resource.contact_info.endereco}</p>` : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+            
+            list.classList.remove('hidden');
+            empty.classList.add('hidden');
+            feather.replace();
+        }
+
+        // Search functionality
+        document.getElementById('search-btn').addEventListener('click', search);
+
+        function search() {
+            const destination = document.getElementById('destination-filter').value;
+            const category = document.getElementById('category-filter').value;
+            
+            if (currentTab === 'guides') {
+                searchGuides(destination, category);
+            } else {
+                searchResources(destination);
+            }
+        }
+
+        async function searchGuides(destination, category) {
+            let url = 'http://127.0.0.1:5000/api/travel-guides?';
+            const params = [];
+            
+            if (destination) params.push(`destination=${encodeURIComponent(destination)}`);
+            if (category) params.push(`category=${encodeURIComponent(category)}`);
+            
+            url += params.join('&');
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayGuides(data.guides);
+            } catch (error) {
+                console.error('Erro na busca:', error);
+            }
+        }
+
+        async function searchResources(destination) {
+            let url = 'http://127.0.0.1:5000/api/travel-resources?';
+            
+            if (destination) {
+                url += `destination=${encodeURIComponent(destination)}`;
+            }
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                displayResources(data.resources);
+            } catch (error) {
+                console.error('Erro na busca:', error);
+            }
+        }
+
+        // Guide modal
+        async function openGuideModal(guideId) {
+            try {
+                const response = await fetch(`http://127.0.0.1:5000/api/travel-guides/${guideId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const guide = data.guide;
+                    document.getElementById('guide-modal-title').textContent = guide.title;
+                    document.getElementById('guide-modal-content').innerHTML = `
+                        <div class="mb-4">
+                            <span class="bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mr-2">${guide.category}</span>
+                            <span class="text-gray-600"><i data-feather="map-pin" class="w-4 h-4 mr-1"></i>${guide.destination}</span>
+                        </div>
+                        <div class="whitespace-pre-line text-gray-700">${guide.content}</div>
+                        ${guide.tags.length > 0 ? `
+                            <div class="mt-4 pt-4 border-t">
+                                <h4 class="font-semibold mb-2">Tags:</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${guide.tags.map(tag => `<span class="bg-gray-200 text-gray-700 text-sm px-2 py-1 rounded">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                    
+                    document.getElementById('guide-modal').classList.remove('hidden');
+                    feather.replace();
+                }
+            } catch (error) {
+                console.error('Erro ao carregar guia:', error);
+            }
+        }
+
+        function closeGuideModal() {
+            document.getElementById('guide-modal').classList.add('hidden');
+        }
+
+        // Logout
+        document.getElementById('logout-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        });
+
+        // Initialize
+        loadGuides();
+    </script>
+</body>
+</html>
