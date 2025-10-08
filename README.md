@@ -1,17 +1,14 @@
-# 🧭 Travel Itinerary Planner - Refatoracao
-
-
+# 🧭 Travel Itinerary Planner - Refatorado com Padrões de Design
 
 > **Projeto Original:** [edgarvtt/Travel-Itinerary-Planner](https://github.com/edgarvtt/Travel-Itinerary-Planner)  
-> **Versão Refatorada:** Expandida com novas funcionalidades e melhorias arquiteturais
+> **Versão Refatorada:** Expandida com padrões de design, arquitetura modular e funcionalidades avançadas
 
-Um aplicativo web completo para planejamento de viagens com classes POO, sistema de usuários, planejamento colaborativo e funcionalidades avançadas de recomendação e comunidade.
 
-## 🚀 **Status do Projeto**
 
-**⚠️ EM PROCESSO DE REFATORAÇÃO**
 
-Este projeto está sendo refatorado e expandido. O próximo passo será implementar **padrões de projeto** para melhorar a arquitetura e manutenibilidade do código.
+**✅ REFATORAÇÃO CONCLUÍDA COM PADRÕES DE DESIGN**
+
+Este projeto foi completamente refatorado com implementação de **5 padrões de design principais**, arquitetura modular e sistema de recomendação inteligente.
 
 ## 📋 **Funcionalidades Implementadas**
 
@@ -37,208 +34,129 @@ Este projeto está sendo refatorado e expandido. O próximo passo será implemen
    - Dashboard personalizado
    - Gerenciamento de sessões
 
-5. **✅ Guias e recursos de viagem** *(NOVO)*
+5. **✅ Guias e recursos de viagem**
    - Guias culturais, gastronômicos e de transporte
    - Recursos úteis (hospitais, embaixadas, aeroportos)
    - Sistema de categorização e tags
    - API completa para gerenciamento
 
-6. **✅ Avaliações de usuários e contribuições da comunidade** *(NOVO)*
+6. **✅ Avaliações de usuários e contribuições da comunidade**
    - Sistema de reviews e ratings
    - Contribuições da comunidade (dicas, destinos)
    - Reações (likes/dislikes) em conteúdo
    - API para gerenciamento de conteúdo colaborativo
 
-### 🔄 **Parcialmente Implementadas - Partes que possuem dependencias externas náo foram feitas**
+7. **✅ Sistema de Recomendação Inteligente** *(NOVO - Strategy Pattern)*
+   - Múltiplas estratégias de recomendação (clima, orçamento, interesses, híbrida)
+   - Algoritmos personalizáveis por usuário
+   - Comparação de estratégias em tempo real
+   - API para testar e comparar algoritmos
 
-7. **🔄 Personalização com base nas preferências** *(NOVO - Parcialmente)*
-   - Sistema de preferências do usuário
-   - Perfis de viagem personalizados
-   - Algoritmo básico de recomendações
-   - **Limitação:** Sistema de IA avançado não implementado
+8. **✅ Cálculo de Orçamento Adaptativo** *(NOVO - Strategy Pattern)*
+   - Estratégias de cálculo (diário, por categoria, flexível)
+   - Adaptação ao perfil do usuário
+   - Cálculos baseados em destino e preferências
+   - API para diferentes métodos de cálculo
 
-8. **🔄 Acesso móvel e funcionalidade offline**
+### 🔄 **Parcialmente Implementadas - Partes que possuem dependências externas não foram feitas**
+
+9. **🔄 Acesso móvel e funcionalidade offline**
    - Interface responsiva implementada
    - **Pendente:** Funcionalidade offline
 
-### ❌ **Não Implementadas - Funcionalidades que possuem dependencias externas**
+### ❌ **Não Implementadas - Funcionalidades que possuem dependências externas**
 
-9. **❌ Integração de reservas**
-   - **Motivo:** Depende de APIs pagas externas
-   - **Impacto:** Não pode ser implementado sem custos adicionais
+10. **❌ Integração de reservas**
+    - **Motivo:** Depende de APIs pagas externas
+    - **Impacto:** Não pode ser implementado sem custos adicionais
 
-10. **❌ Integração de mapas e planejamento de rotas**
+11. **❌ Integração de mapas e planejamento de rotas**
     - **Motivo:** Depende de APIs de mapas (Google Maps, OpenStreetMap)
     - **Impacto:** Requer chaves de API e configuração externa
 
-## 🆕 **Novas Funcionalidades Implementadas**
+## 🎯 **Padrões de Design Implementados**
 
-### **1. Sistema de Guias de Viagem**
+### **1. Singleton Pattern** ✅
 ```python
-class TravelGuide(ItineraryItem):
-    # Guias culturais, gastronômicos, de transporte
-    # Sistema de categorização e tags
-    # Conteúdo rico e estruturado
-```
-
-### **2. Sistema de Recursos Úteis**
-```python
-class TravelResource(ItineraryItem):
-    # Hospitais, embaixadas, aeroportos
-    # Informações de contato e localização
-    # Recursos categorizados por tipo
-```
-
-### **3. Sistema de Avaliações e Contribuições**
-```python
-class Review(ItineraryItem):
-    # Reviews com rating e comentários
-    # Sistema de reações (likes/dislikes)
+class DataStore:
+    _instance = None
+    _lock = threading.Lock()
     
-class UserContribution(ItineraryItem):
-    # Dicas da comunidade
-    # Sugestões de destinos
-    # Conteúdo colaborativo
+    def __new__(cls):
+        # Garante uma única instância em toda a aplicação
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+        return cls._instance
 ```
+**Benefícios:** Gerenciamento centralizado de dados, thread-safety, consistência de estado.
 
-### **4. Sistema de Personalização**
+### **2. Factory Method Pattern** ✅
 ```python
-class UserPreference(ItineraryItem):
-    # Preferências de clima, orçamento, interesses
-    # Sistema de pesos para priorização
+class ItineraryItemFactory(ABC):
+    @abstractmethod
+    def create_item(self, item_id, trip_id, **kwargs):
+        pass
+
+class FlightFactory(ItineraryItemFactory):
+    def create_item(self, item_id, trip_id, **kwargs):
+        return Flight(item_id, trip_id, **kwargs)
+```
+**Benefícios:** Criação flexível de objetos, extensibilidade, desacoplamento.
+
+### **3. Builder Pattern** ✅
+```python
+class TripBuilder:
+    def set_destination(self, destination):
+        self._trip_data['destination'] = destination
+        return self
     
-class TravelProfile(ItineraryItem):
-    # Perfis de viagem personalizados
-    # Estilos de viagem (cultural, aventura, etc.)
+    def set_dates(self, start_date, end_date):
+        self._trip_data['start_date'] = start_date
+        self._trip_data['end_date'] = end_date
+        return self
     
-class Recommendation(ItineraryItem):
-    # Recomendações personalizadas
-    # Algoritmo básico de matching
+    def build(self):
+        return Trip(**self._trip_data)
 ```
+**Benefícios:** Construção fluente, validação integrada, flexibilidade na criação.
 
-## 🏗️ **Arquitetura Técnica**
-
-### **Backend (Python/Flask)**
-- **Framework:** Flask com CORS habilitado
-- **Banco de Dados:** JSON persistente (`database.json`)
-- **APIs:** RESTful endpoints para todas as funcionalidades
-- **Classes:** 15+ classes POO com herança e polimorfismo
-
-### **Frontend (HTML/CSS/JavaScript)**
-- **Design:** Interface responsiva com Tailwind CSS
-- **Páginas:** Landing page, dashboard, planner, detalhes
-- **Funcionalidades:** Sistema de usuários, planejamento colaborativo
-
-### **Padrões POO Implementados**
-- **Herança:** `ItineraryItem` como classe base
-- **Polimorfismo:** Duck typing com método `to_dict()`
-- **Encapsulamento:** Classe `DataStore` para gerenciamento de dados
-- **Classe Abstrata:** `ItineraryItem` (conceitualmente)
-
-## 📊 **Estatísticas do Projeto**
-
-| Métrica | Original | Refatorado | Aumento |
-|---------|----------|------------|---------|
-| Classes | 8 | 15+ | +87% |
-| Funcionalidades | 3/10 | 6/10 | +100% |
-| Linhas de Código | ~800 | ~1100+ | +37% |
-| Endpoints API | 12 | 25+ | +108% |
-
-## 🚀 **Como Usar**
-
-### **Pré-requisitos**
-```bash
-# Instalar Python 3.8+
-# Instalar Flask e dependências
-pip install flask flask-cors
+### **4. Template Method Pattern** ✅
+```python
+class ItineraryItemProcessor(ABC):
+    def process_item(self, item_data, trip_id, user_id):
+        # Estrutura fixa do algoritmo
+        validated_data = self.validate_item_data(item_data)
+        processed_item = self.create_item_object(validated_data, trip_id)
+        enriched_item = self.enrich_item_data(processed_item, user_id)
+        saved_item = self.save_item(enriched_item)
+        self.log_processing_result(saved_item)
+        return saved_item
+    
+    @abstractmethod
+    def validate_specific_data(self, item_data):
+        pass
 ```
+**Benefícios:** Algoritmo consistente, personalização de passos, reutilização de código.
 
-### **Executar o Projeto**
-```bash
-# 1. Clone o repositório
-git clone <seu-repositorio>
+### **5. Strategy Pattern** ✅
+```python
+class RecommendationStrategy(ABC):
+    @abstractmethod
+    def calculate_score(self, user_preferences, user_profile, target_item):
+        pass
 
-# 2. Navegue para o diretório
-cd Travel-Itinerary-Planner/PROJETO-POO
+class ClimateBasedRecommendation(RecommendationStrategy):
+    def calculate_score(self, user_preferences, user_profile, target_item):
+        # Algoritmo baseado em clima
+        return score
 
-# 3. Execute o servidor
-python app.py
-
-# 4. Abra no navegador
-# http://localhost:5000
-# Abra index.html para a interface web
+class BudgetBasedRecommendation(RecommendationStrategy):
+    def calculate_score(self, user_preferences, user_profile, target_item):
+        # Algoritmo baseado em orçamento
+        return score
 ```
+**Benefícios:** Algoritmos intercambiáveis, extensibilidade, personalização.
 
-### **Estrutura do Projeto**
-```
-PROJETO-POO/
-├── app.py              # Servidor Flask e lógica backend
-├── database.json       # Banco de dados JSON
-├── index.html          # Página inicial
-├── dashboard.html      # Dashboard do usuário
-├── login.html          # Sistema de login
-├── signup.html         # Sistema de cadastro
-└── trip-details.html   # Detalhes da viagem
-```
 
-## 🔄 **Próximos Passos - Padrões de Projeto**
-
-### **1. Padrões Arquiteturais**
-- **MVC (Model-View-Controller):** Separar lógica de negócio da apresentação
-- **Repository Pattern:** Abstrair acesso aos dados
-- **Service Layer:** Camada de serviços para lógica de negócio
-
-### **2. Padrões de Criação**
-- **Factory Method:** Para criação de diferentes tipos de itinerários
-- **Builder Pattern:** Para construção complexa de viagens
-- **Singleton:** Para gerenciamento de configurações
-
-### **3. Padrões Estruturais**
-- **Adapter:** Para integração com APIs externas futuras
-- **Decorator:** Para adicionar funcionalidades aos objetos
-- **Facade:** Para simplificar interfaces complexas
-
-### **4. Padrões Comportamentais**
-- **Observer:** Para notificações em tempo real
-- **Strategy:** Para diferentes algoritmos de recomendação
-- **Command:** Para operações de undo/redo
-
-## 🤝 **Contribuição**
-
-Este projeto está em processo de refatoração. Contribuições são bem-vindas:
-
-1. **Fork** o repositório
-2. **Crie** uma branch para sua feature
-3. **Commit** suas mudanças
-4. **Push** para a branch
-5. **Abra** um Pull Request
-
-## 📝 **Changelog**
-
-### **v2.0 - Refatoração Major**
-- ✅ Implementação de 3 novas funcionalidades principais
-- ✅ Sistema de guias e recursos de viagem
-- ✅ Sistema de avaliações e contribuições da comunidade
-- ✅ Sistema de personalização e recomendações
-- ✅ Expansão de 8 para 15+ classes
-- ✅ Adição de 13+ novos endpoints API
-- ✅ Melhoria na documentação e estrutura do código
-
-### **v1.0 - Projeto Original**
-- ✅ Sistema básico de planejamento de viagens
-- ✅ Planejamento colaborativo
-- ✅ Gerenciamento de orçamento
-- ✅ Interface web responsiva
-
-## 📄 **Licença**
-
-Este projeto é baseado no projeto original de [edgarvtt/Travel-Itinerary-Planner](https://github.com/edgarvtt/Travel-Itinerary-Planner) e está sendo refatorado para fins educacionais.
-
-## 👨‍💻 **Autor**
-
-**Projeto Original:** [edgarvtt](https://github.com/edgarvtt)  
-**Refatoração:** [Seu Nome](https://github.com/seuusuario)
-
----
-
-**⚠️ Nota:** Este projeto está em processo ativo de refatoração. A próxima versão incluirá implementação de padrões de projeto para melhorar a arquitetura e manutenibilidade do código.

@@ -71,6 +71,18 @@
             "name": "lian",
             "email": "lian@gmail.com",
             "password": "12345678"
+        },
+        {
+            "id": 13,
+            "name": "Jo\u00e3o",
+            "email": "joao@email.com",
+            "password": "senha123"
+        },
+        {
+            "id": 14,
+            "name": "Maria",
+            "email": "maria@email.com",
+            "password": "senha456"
         }
     ],
     "trips": [
