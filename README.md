@@ -2,7 +2,8 @@
 
 > **Projeto Original:** [edgarvtt/Travel-Itinerary-Planner](https://github.com/edgarvtt/Travel-Itinerary-Planner)  
 > **Versão Refatorada:** Expandida com padrões de design, arquitetura modular e funcionalidades avançadas
-> **Proximos Pasos** Implementar mais um padrao comportamental (Obsever) e outros estruturais
+> 
+> **Proximos Passos** Implementar mais um padrao comportamental (Obsever) e outros estruturais
 
 
 
